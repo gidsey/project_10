@@ -6,6 +6,15 @@ from peewee import *
 
 import config
 
+DATABASE = SqliteDatabase('todo.sqlite')
+
+
+class Todo(Model):
+    name = CharField(unique=True)
+
+    class Meta:
+        database = DATABASE
+
 
 def initialize():
     DATABASE.connect(reuse_if_open=True)
