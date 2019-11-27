@@ -5,7 +5,6 @@ from flask_restful import Resource, Api, reqparse, inputs, fields, marshal, mars
 import models
 
 todo_fields = {
-    'id': fields.Integer,
     'name': fields.String,
 }
 
@@ -23,13 +22,15 @@ class TodoList(Resource):
 
     def get(self):
         todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
-        return {'todos': todos}
+        # print(todos)
+        return todos
 
     @marshal_with(todo_fields)
     def post(self):
         args = self.reqparse.parse_args()
         todo = models.Todo.create(**args)
         return 201, {'location': url_for('resources.todos.todo', id=todo.id)}
+
 
 
 todos_api = Blueprint('resources.todos', __name__)
