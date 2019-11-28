@@ -1,11 +1,15 @@
-from flask import Blueprint, url_for
+import json
 
-from flask_restful import Resource, Api, reqparse, inputs, fields, marshal, marshal_with, abort
+from flask import Blueprint, url_for, make_response
+
+from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
 
 import models
 
 todo_fields = {
     'name': fields.String,
+    'edited': fields.Boolean,
+    'completed': fields.Boolean,
 }
 
 
@@ -27,6 +31,20 @@ class TodoList(Resource):
             help='No name provided',
             location=['form', 'json']
         )
+        self.reqparse.add_argument(
+            'edited',
+            required=True,
+            help='No edit state provided',
+            location=['form', 'json'],
+            type=bool
+        )
+        self.reqparse.add_argument(
+            'completed',
+            required=True,
+            help='No completed state provided',
+            location=['form', 'json'],
+            type=bool
+        )
         super().__init__()
 
     def get(self):
@@ -39,7 +57,6 @@ class TodoList(Resource):
         todo = models.Todo.create(**args)
         return {'name': todo.name}, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
 
-
 class Todo(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -48,6 +65,20 @@ class Todo(Resource):
             required=True,
             help='No name provided',
             location=['form', 'json']
+        )
+        self.reqparse.add_argument(
+            'edited',
+            required=True,
+            help='No edit state provided',
+            location=['form', 'json'],
+            type=bool
+        )
+        self.reqparse.add_argument(
+            'completed',
+            required=True,
+            help='No completed state provided',
+            location=['form', 'json'],
+            type=bool
         )
         super().__init__()
 
@@ -62,6 +93,16 @@ class Todo(Resource):
         query.execute()
         todo = todo_or_404(id)
         return {'name': todo.name}, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
+
+
+    def delete(self, id):
+        try:
+            todo = models.Todo.get(models.Todo.id == id)
+        except models.Todo.DoesNotExsist():
+            return make_response(json.dumps({'error': "That todo does not exist"}), 403)
+        else:
+            todo.delete_instance()
+        return '', 204,
 
 
 todos_api = Blueprint('resources.todos', __name__)

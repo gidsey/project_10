@@ -11,6 +11,8 @@ DATABASE = SqliteDatabase('todo.sqlite')
 
 class Todo(Model):
     name = CharField()
+    edited = BooleanField(default=False)
+    completed = BooleanField(default=False)
 
     class Meta:
         database = DATABASE
