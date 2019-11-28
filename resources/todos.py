@@ -31,14 +31,12 @@ class TodoList(Resource):
 
     def get(self):
         todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
-        # print(todos)
         return todos
 
     @marshal_with(todo_fields)
     def post(self):
         args = self.reqparse.parse_args()
         todo = models.Todo.create(**args)
-        print(todo.name)
         return {'name': todo.name}, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
 
 
@@ -63,7 +61,7 @@ api = Api(todos_api)
 
 api.add_resource(
     TodoList,
-    '/todos',v
+    '/todos',
     endpoint='todos'
 )
 

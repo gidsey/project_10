@@ -10,7 +10,7 @@ DATABASE = SqliteDatabase('todo.sqlite')
 
 
 class Todo(Model):
-    name = CharField(unique=True)
+    name = CharField()
 
     class Meta:
         database = DATABASE
