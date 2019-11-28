@@ -9,6 +9,15 @@ todo_fields = {
 }
 
 
+def todo_or_404(todo_id):
+    try:
+        todo = models.Todo.get(models.Todo.id == todo_id)
+    except models.Todo.DoesNotExist:
+        abort(404, message='Todo {} does not exist'.format(todo_id))
+    else:
+        return todo
+
+
 class TodoList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -29,8 +38,24 @@ class TodoList(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         todo = models.Todo.create(**args)
-        return 201, {'location': url_for('resources.todos.todo', id=todo.id)}
+        print(todo.name)
+        return {'name': todo.name}, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
 
+
+class Todo(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'name',
+            required=True,
+            help='No name provided',
+            location=['form', 'json']
+        )
+        super().__init__()
+
+    @marshal_with(todo_fields)
+    def get(self, id):
+        return todo_or_404(id)
 
 
 todos_api = Blueprint('resources.todos', __name__)
@@ -38,6 +63,12 @@ api = Api(todos_api)
 
 api.add_resource(
     TodoList,
-    '/todos',
+    '/todos',v
     endpoint='todos'
+)
+
+api.add_resource(
+    Todo,
+    '/todos/<int:id>',
+    endpoint='todo'
 )
