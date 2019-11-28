@@ -55,6 +55,14 @@ class Todo(Resource):
     def get(self, id):
         return todo_or_404(id)
 
+    @marshal_with(todo_fields)
+    def put(self, id):
+        args = self.reqparse.parse_args()
+        query = models.Todo.update(**args).where(models.Todo.id == id)
+        query.execute()
+        todo = todo_or_404(id)
+        return {'name': todo.name}, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
+
 
 todos_api = Blueprint('resources.todos', __name__)
 api = Api(todos_api)
