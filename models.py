@@ -10,6 +10,7 @@ import config
 DATABASE = SqliteDatabase('todo.sqlite')
 HASHER = PasswordHasher()
 
+
 class User(Model):
     username = CharField(unique=True)
     email = CharField(unique=True)
@@ -63,6 +64,10 @@ class Todo(Model):
     completed = BooleanField(default=False)
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(null=True, default=None)
+    created_by = ForeignKeyField(User,
+                                 related_name='todo_set',
+                                 null=True,
+                                 default=None)
 
     class Meta:
         database = DATABASE
