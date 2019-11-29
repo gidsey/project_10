@@ -103,8 +103,8 @@ class Todo(Resource):
     def delete(self, id):
         try:
             todo = models.Todo.get(models.Todo.id == id)
-        except models.Todo.DoesNotExsist():
-            return make_response(json.dumps({'error': "That todo does not exist"}), 403)
+        except models.Todo.DoesNotExist:
+            return make_response(json.dumps({'error': "That TODO does not exist"}), 403)
         else:
             todo.delete_instance()
         return '', 204,
