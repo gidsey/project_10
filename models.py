@@ -13,6 +13,8 @@ class Todo(Model):
     name = CharField()
     edited = BooleanField(default=False)
     completed = BooleanField(default=False)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(null=True, default=None)
 
     class Meta:
         database = DATABASE

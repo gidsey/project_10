@@ -7,9 +7,12 @@ from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with
 import models
 
 todo_fields = {
+    'id': fields.Integer,
     'name': fields.String,
     'edited': fields.Boolean,
     'completed': fields.Boolean,
+    'created_at': fields.DateTime,
+    'updated_at': fields.DateTime,
 }
 
 
@@ -31,31 +34,18 @@ class TodoList(Resource):
             help='No name provided',
             location=['form', 'json']
         )
-        self.reqparse.add_argument(
-            'edited',
-            required=True,
-            help='No edit state provided',
-            location=['form', 'json'],
-            type=bool
-        )
-        self.reqparse.add_argument(
-            'completed',
-            required=True,
-            help='No completed state provided',
-            location=['form', 'json'],
-            type=bool
-        )
         super().__init__()
 
     def get(self):
         todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
+        print(todos)
         return todos
 
     @marshal_with(todo_fields)
     def post(self):
         args = self.reqparse.parse_args()
         todo = models.Todo.create(**args)
-        return {'name': todo.name}, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
+        return todo, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
 
 class Todo(Resource):
     def __init__(self):
@@ -79,6 +69,18 @@ class Todo(Resource):
             help='No completed state provided',
             location=['form', 'json'],
             type=bool
+        )
+        self.reqparse.add_argument(
+            'created_at',
+            required=True,
+            help='No created_at time provided',
+            location=['form', 'json'],
+        )
+        self.reqparse.add_argument(
+            'updated_at',
+            required=True,
+            help='No updated_at time provided',
+            location=['form', 'json'],
         )
         super().__init__()
 
