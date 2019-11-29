@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from flask import Blueprint, url_for, make_response
 
@@ -11,8 +12,8 @@ todo_fields = {
     'name': fields.String,
     'edited': fields.Boolean,
     'completed': fields.Boolean,
-    'created_at': fields.DateTime,
-    'updated_at': fields.DateTime,
+    'created_at': fields.String,
+    'updated_at': fields.String,
 }
 
 
@@ -38,7 +39,7 @@ class TodoList(Resource):
 
     def get(self):
         todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
-        print(todos)
+        # print(todos)
         return todos
 
     @marshal_with(todo_fields)
@@ -70,12 +71,12 @@ class Todo(Resource):
             location=['form', 'json'],
             type=bool
         )
-        self.reqparse.add_argument(
-            'created_at',
-            required=True,
-            help='No created_at time provided',
-            location=['form', 'json'],
-        )
+        # self.reqparse.add_argument(
+        #     'created_at',
+        #     required=True,
+        #     help='No created_at time provided',
+        #     location=['form', 'json'],
+        # )
         self.reqparse.add_argument(
             'updated_at',
             required=True,
@@ -91,10 +92,12 @@ class Todo(Resource):
     @marshal_with(todo_fields)
     def put(self, id):
         args = self.reqparse.parse_args()
+        args.edited = False
+        args.updated_at = datetime.datetime.now()
         query = models.Todo.update(**args).where(models.Todo.id == id)
         query.execute()
         todo = todo_or_404(id)
-        return {'name': todo.name}, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
+        return todo, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
 
 
     def delete(self, id):
