@@ -2,8 +2,6 @@ import datetime
 
 from peewee import *
 
-# import config
-
 DATABASE = SqliteDatabase('todo.sqlite')
 
 
