@@ -1,18 +1,15 @@
 import json
 import datetime
 
-from flask import Blueprint, url_for, make_response, g
+from flask import Blueprint, url_for, make_response
 
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
-
-# from auth import auth
 
 import models
 
 todo_fields = {
     'id': fields.Integer,
     'name': fields.String,
-    'created_by': fields.String,
     'edited': fields.Boolean,
     'completed': fields.Boolean,
     'created_at': fields.String,
@@ -47,9 +44,7 @@ class TodoList(Resource):
     @marshal_with(todo_fields)
     def post(self):
         args = self.reqparse.parse_args()
-        todo = models.Todo.create(
-            created_by=g.user,
-            **args)
+        todo = models.Todo.create(**args)
         return todo, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
 
 
