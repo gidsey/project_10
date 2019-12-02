@@ -1,8 +1,9 @@
 import datetime
 
 from peewee import *
+import config
 
-DATABASE = SqliteDatabase('todo.sqlite')
+db = SqliteDatabase('todo.db')
 
 
 class Todo(Model):
@@ -14,10 +15,9 @@ class Todo(Model):
     updated_at = DateTimeField(null=True, default=None)
 
     class Meta:
-        database = DATABASE
-
+        database = db
 
 def initialize():
-    DATABASE.connect(reuse_if_open=True)
-    DATABASE.create_tables([Todo], safe=True)
-    DATABASE.close()
+    db.connect(reuse_if_open=True)
+    db.create_tables([Todo], safe=True)
+    db.close()
