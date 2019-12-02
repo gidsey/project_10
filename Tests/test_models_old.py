@@ -7,7 +7,7 @@ from app import models
 from flask_fixtures import FixturesMixin
 
 # Configure the app with the testing configuration
-app.config.from_object('myapp.config.TestConfig')
+app.config.from_object('app.config.TestConfig')
 
 
 # Make sure to inherit from the FixturesMixin class
@@ -20,13 +20,14 @@ class TestModel(unittest.TestCase, FixturesMixin):
 
     # Specify the Flask app and db we want to use for this set of tests
     app = app
+
     # db = db
 
     # Your tests go here
 
     def test_authors(self):
         todos = models.Todo.query.all()
-        assert len(todos) == todos.query.count() == 1
+        assert len(todos) == todos.query.count() == 2
         # assert len(todos[0].books) == 3
 
 

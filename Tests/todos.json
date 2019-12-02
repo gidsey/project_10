@@ -2,12 +2,22 @@
   {
     "table": "todo",
     "records": [
-      {"name": "clean the house"},
-      {"name": "water the dog"},
-      {"name": "feed the lawn"},
-      {"name": "pay dem bills"},
-      {"name": "run"},
-      {"name": "swim"}]
+      {
+        "id": 1,
+        "name": "clean the house",
+        "edited": 0,
+        "created_at": "2019-11-30 13:28:58.924532",
+        "updated_at": ""
+      },
+      {
+        "id": 2,
+        "name": "water the dog",
+        "edited": 0,
+        "created_at": "2019-11-30 13:38:58.924532",
+        "updated_at": ""
+      }
+    ]
   }
 ]
+
 
