@@ -3,6 +3,7 @@ import json
 import unittest
 from app import app
 import models
+import datetime
 
 MODELS = [models.Todo]
 # use an in-memory SQLite for tests.
@@ -14,6 +15,12 @@ class BaseTestCase(unittest.TestCase):
         self.app = app
         self.client = app.test_client()
         self.data = {"name": "Walk the dog"}
+        self.newdata = {
+            "name": "Feed the cat",
+            "edited": True,
+            "completed": False,
+            "updated_at": "",
+        }
         self.app.testing = True
         # Bind model classes to test db. Since we have a complete list of
         # all models, we do not need to recursively bind dependencies.
@@ -53,6 +60,12 @@ class BaseTestCase(unittest.TestCase):
             content_type='application/json')
         self.assertEqual(resp.status_code, 200)
 
+        #  EDIT TASK
+        resp = self.client.put(
+            path='/api/v1/todos/{}'.format(todo.id),
+            data=json.dumps(self.newdata),
+            content_type='application/json')
+        self.assertEqual(resp.status_code, 200)
 
 if __name__ == '__main__':
     unittest.main()
