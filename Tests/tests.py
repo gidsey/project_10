@@ -67,5 +67,11 @@ class BaseTestCase(unittest.TestCase):
             content_type='application/json')
         self.assertEqual(resp.status_code, 200)
 
+        #  DELETE TASK
+        resp = self.client.delete(
+            path='/api/v1/todos/{}'.format(todo.id))
+        self.assertEqual(resp.status_code, 204)
+
+
 if __name__ == '__main__':
     unittest.main()
