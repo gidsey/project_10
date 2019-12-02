@@ -2,15 +2,19 @@ from peewee import SqliteDatabase
 import json
 import unittest
 from app import app
-from models import Todo
+import models
 
-MODELS = [Todo]
+MODELS = [models.Todo]
 # use an in-memory SQLite for tests.
 test_db = SqliteDatabase(':memory:')
 
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
+        self.app = app
+        self.client = app.test_client()
+        self.data = {"name": "Walk the dog"}
+        self.app.testing = True
         # Bind model classes to test db. Since we have a complete list of
         # all models, we do not need to recursively bind dependencies.
         test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
@@ -27,22 +31,25 @@ class BaseTestCase(unittest.TestCase):
         # Close connection to db.
         test_db.close()
 
-    def test_post_todo(self):
+    def test_todo(self):
+
+        #  POST
         resp = self.client.post(
             path='/api/v1/todos',
             data=json.dumps(self.data),
             content_type='application/json')
         self.assertEqual(resp.status_code, 201)
+        todo = models.Todo.get(name='Walk the dog')
 
-    def test_get_all_todos(self):
+        #  GET ALL
         resp = self.client.get(
             path='/api/v1/todos',
             content_type='application/json')
         self.assertEqual(resp.status_code, 200)
 
-    def test_get_single_todos(self):
+        #  GET SINGLE
         resp = self.client.get(
-            path='/api/v1/todos/1',
+            path='/api/v1/todos/{}'.format(todo.id),
             content_type='application/json')
         self.assertEqual(resp.status_code, 200)
 
