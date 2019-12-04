@@ -2,8 +2,7 @@ import datetime
 
 from peewee import *
 
-db = SqliteDatabase('todo.db')
-
+db = SqliteDatabase('todo.sqlite')
 
 class Todo(Model):
     """Hold all the To-do tasks."""
