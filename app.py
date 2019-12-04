@@ -16,5 +16,4 @@ def my_todos():
 
 if __name__ == '__main__':
     app.run(debug=config.DEBUG, host=config.HOST, port=config.PORT)
-
-models.initialize()
+    models.initialize()

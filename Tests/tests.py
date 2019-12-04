@@ -13,6 +13,7 @@ test_db = SqliteDatabase(':memory:')
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app
+        self.app.testing = True
         self.client = app.test_client()
         self.data = {"name": "Walk the dog"}
         self.newdata = {
@@ -21,11 +22,9 @@ class BaseTestCase(unittest.TestCase):
             "completed": False,
             "updated_at": "",
         }
-        self.app.testing = True
         # Bind model classes to test db. Since we have a complete list of
         # all models, we do not need to recursively bind dependencies.
         test_db.bind(MODELS, bind_refs=False, bind_backrefs=False)
-
         test_db.connect()
         test_db.create_tables(MODELS)
 
@@ -39,7 +38,6 @@ class BaseTestCase(unittest.TestCase):
         test_db.close()
 
     def test_todo(self):
-
         #  POST
         resp = self.client.post(
             path='/api/v1/todos',
