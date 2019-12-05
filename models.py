@@ -64,7 +64,7 @@ class Todo(Model):
     completed = BooleanField(default=False)
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(null=True, default=None)
-    user = ForeignKeyField(User, related_name='todo_set', on_delete='CASCADE')
+    created_by = ForeignKeyField(User, related_name='todo_set', on_delete='CASCADE')
 
     class Meta:
         database = db

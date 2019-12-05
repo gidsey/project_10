@@ -1,9 +1,11 @@
 import json
 import datetime
 
-from flask import Blueprint, url_for, make_response
+from flask import Blueprint, url_for, make_response, g
 
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
+
+from auth import auth
 
 import models
 
@@ -14,6 +16,7 @@ todo_fields = {
     'completed': fields.Boolean,
     'created_at': fields.String,
     'updated_at': fields.String,
+    'created_by': fields.String,
 }
 
 
@@ -24,6 +27,9 @@ def todo_or_404(todo_id):
         abort(404, message='Todo {} does not exist'.format(todo_id))
     else:
         return todo
+
+def add_user(todo):
+    todo.created_by = models.User.get()
 
 
 class TodoList(Resource):
@@ -42,9 +48,13 @@ class TodoList(Resource):
         return todos
 
     @marshal_with(todo_fields)
+    @auth.login_required
     def post(self):
         args = self.reqparse.parse_args()
-        todo = models.Todo.create(**args)
+        todo = models.Todo.create(
+            created_by=g.user,
+            **args
+        )
         return todo, 201, {'location': url_for('resources.todos.todo', id=todo.id)}
 
 
