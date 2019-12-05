@@ -17,18 +17,18 @@ Method    | Endpoint        |Data                   | Description              |
 |GET      | api/v1/todos    |                       | return all todos         | ✖              |✖           
 |POST     | api/v1/todos    |name                   | create todo              | ✔             |✔
 |GET      | api/v1/todos/id |id                     | return todo detail       | ✖              |✖
-|PUT      | courses/id      |title<br>url           | edit course             | ✔             |✔
-|DELETE   | courses/id      |                       | immediately delete selcetd course  | ✔             |✔
+|PUT      | api/v1/todos/id |name<br>edited<br>completed<br>updated_at| edit todo             | ✔             |✔
+|DELETE   |api/v1/todos/id  |                       | immediately delete selcetd course  | ✔             |✔
 
-### Fields
-
---|--|---|---|---------------------|
-|id|primary-key|auto-generated|
-|name|text|required|
+### Model Fields
+Name   | Type        |Required? |
+----------|-----------------|---|
+|id|Primary Key|required (auto-set)|
+|name|Text|required|
 |edited|Boolean|not required|
 |completed|Boolean|not required|
-|created_at|Datetime|auto-set|
-|updated_at|Datetime|auto-set|
+|created_at|Datetime|required (auto-set)|
+|updated_at|Datetime|not required (auto-set)|
 
 ## Running Locally
 
