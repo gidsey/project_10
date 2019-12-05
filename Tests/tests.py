@@ -2,10 +2,10 @@ from peewee import SqliteDatabase
 import json
 import unittest
 from app import app
-import models
+from models import Todo
 import datetime
 
-MODELS = [models.Todo]
+MODELS = [Todo]
 # use an in-memory SQLite for tests.
 test_db = SqliteDatabase(':memory:')
 
@@ -37,6 +37,15 @@ class BaseTestCase(unittest.TestCase):
         # Close connection to db.
         test_db.close()
 
+
+    def test_get_all(self):
+        resp = self.client.get(
+            path='/api/v1/todos',
+            content_type='application/json')
+        self.assertEqual(resp.status_code, 200)
+
+
+
     def test_todo(self):
         #  POST
         resp = self.client.post(
@@ -44,7 +53,7 @@ class BaseTestCase(unittest.TestCase):
             data=json.dumps(self.data),
             content_type='application/json')
         self.assertEqual(resp.status_code, 201)
-        todo = models.Todo.get(name='Walk the dog')
+        todo = Todo.get(name='Walk the dog')
 
         #  GET ALL
         resp = self.client.get(
