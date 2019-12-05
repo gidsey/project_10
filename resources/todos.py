@@ -87,6 +87,8 @@ class Todo(Resource):
     def put(self, id):
         args = self.reqparse.parse_args()
         args.edited = False
+        print(args.name)
+        print(args.completed)
         args.updated_at = datetime.datetime.now()
         query = models.Todo.update(**args).where(models.Todo.id == id)
         query.execute()
