@@ -1,21 +1,86 @@
-from flask import Flask, render_template, g, jsonify
+from flask import Flask, render_template, g, jsonify, flash, redirect, url_for
+
+from flask_login import (LoginManager, login_user, logout_user,
+                         login_required, current_user)
+from argon2 import PasswordHasher
 
 import config
 import models
+import forms
+
 from auth import auth
 
 from resources.users import users_api
 from resources.todos import todos_api
 
-
 app = Flask(__name__)
+app.secret_key = config.SECRET_KEY
 app.register_blueprint(users_api, url_prefix='/api/v1')
 app.register_blueprint(todos_api, url_prefix='/api/v1')
+
+# Set up the login manager for the app
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  # Name of the login view.
+
+HASHER = PasswordHasher()
+
+
+@login_manager.user_loader
+def load_user(userid):
+    """Look up a user."""
+    try:
+        return models.User.get(models.User.id == userid)
+    except models.DoesNotExist:
+        return None
+
+
+@app.before_request
+def before_request():
+    """Connect to the DB before each request."""
+    g.db = models.db
+    g.db.connect()
+    g.user = current_user
+
+
+@app.after_request
+def after_request(response):
+    """Close the DB connection after each request."""
+    g.db.close()
+    return response
 
 
 @app.route('/')
 def my_todos():
     return render_template('index.html')
+
+
+@app.route('/login', methods=('GET', 'POST'))
+def login():
+    """Define the login view."""
+    form = forms.LoginForm()
+    if form.validate_on_submit():
+        try:
+            user = models.User.get(models.User.email == form.email.data)
+        except models.DoesNotExist:
+            flash("Your email or password does not match.", "error")
+        else:
+            if HASHER.verify(user.password, form.password.data):
+                login_user(user)
+                flash("Login successful.", "success")
+                return redirect(url_for('my_todos'))
+            else:
+                flash("Your email or password does not match.", "error")
+    return render_template('login.html', form=form)  # unsuccesful login
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    """Define the logout view."""
+    logout_user()
+    flash("Logout successful.", "success")
+    return redirect(url_for('my_todos'))
 
 
 @app.route('/api/v1/users/token', methods=['GET'])

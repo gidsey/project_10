@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Todo API with Flask</title>
+  <link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/static/styles/main.css" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="/static/images/favicon.png">
+</head>
+
+<body>
+  <!-- Flash messages -->
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="notification {{category}}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+ <nav>{% block content %}{% endblock %}</nav>
+</body>
+</html>

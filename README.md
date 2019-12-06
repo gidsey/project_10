@@ -19,7 +19,7 @@ Method    | Endpoint        |Data                   | Description              |
 |POST     | api/v1/todos    |name                   | create todo              | ✔             |✔
 |GET      | api/v1/todos/id |id                     | return todo detail       | ✖              |✖
 |PUT      | api/v1/todos/id |name<br>edited<br>completed<br>updated_at| edit todo             | ✔             |✔
-|DELETE   |api/v1/todos/id  |                       | immediately delete selected todo  | ✔             |✔
+|DELETE   |api/v1/todos/id  |                       | immediately delete selected todo  | ✔           |✔
 
 ### Model Fields
 Name   | Type        |Required? |

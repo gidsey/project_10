@@ -1,7 +1,6 @@
 import json
 
 from flask import Blueprint, make_response
-
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
 
 import models
@@ -9,6 +8,7 @@ import models
 user_fields = {
     'username': fields.String,
 }
+
 
 def user_or_404(user_id):
     try:

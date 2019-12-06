@@ -3,6 +3,7 @@ import datetime
 from argon2 import PasswordHasher
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
                           BadSignature, SignatureExpired)
+from flask_login import UserMixin
 
 from peewee import *
 import config
@@ -11,13 +12,16 @@ db = SqliteDatabase('todo.sqlite')
 HASHER = PasswordHasher()
 
 
-class User(Model):
+class User(UserMixin, Model):
     username = CharField(unique=True)
     email = CharField(unique=True)
     password = CharField()
 
     class Meta:
         database = db
+
+    def __str__(self):
+        return self.username
 
     @classmethod
     def create_user(cls, username, email, password, **kwargs):
