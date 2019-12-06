@@ -10,6 +10,7 @@ Method    | Endpoint        |Data                   | Description              |
 ----------|-----------------|-----------------------|--------------------------|----------------|--------
 |GET      | users           |                       | list all users           | ✖             | ✖           
 |POST     | users           |username<br>email<br>password<br>verify_password  | create user  | ✖ |✔
+|GET      | users/id        |                        | return username          | ✖                 |✔
 
 ### Todos
 Method    | Endpoint        |Data                   | Description              | Auth Req? | Rate Limited? 

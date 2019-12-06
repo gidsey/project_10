@@ -28,8 +28,8 @@ def todo_or_404(todo_id):
     else:
         return todo
 
-def add_user(todo):
-    todo.created_by = models.User.get()
+# def add_user(todo):
+#     todo.created_by = models.User.get()
 
 
 class TodoList(Resource):

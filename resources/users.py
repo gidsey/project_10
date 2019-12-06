@@ -2,13 +2,21 @@ import json
 
 from flask import Blueprint, make_response
 
-from flask_restful import Resource, Api, reqparse, fields, marshal
+from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
 
 import models
 
 user_fields = {
     'username': fields.String,
 }
+
+def user_or_404(user_id):
+    try:
+        user = models.User.get(models.User.id == user_id)
+    except models.User.DoesNotExist:
+        abort(404, message='User withh ID {} does not exist'.format(user_id))
+    else:
+        return user
 
 
 class UserList(Resource):
@@ -52,6 +60,15 @@ class UserList(Resource):
         return make_response(json.dumps({'error': "Password and password verification do not match"}), 400)
 
 
+class User(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+
+    @marshal_with(user_fields)
+    def get(self, id):
+        return user_or_404(id)
+
+
 users_api = Blueprint('resources.users', __name__)
 api = Api(users_api)
 
@@ -61,3 +78,8 @@ api.add_resource(
     endpoint='users'
 )
 
+api.add_resource(
+    User,
+    '/users/<int:id>',
+    endpoint='user'
+)
