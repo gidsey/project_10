@@ -29,13 +29,6 @@ def todo_or_404(todo_id):
         return todo
 
 
-# def add_created_by(todo):
-#     todo.created_by = url_for('resources.users.user', id=todo.created_by)
-#     print(todo)
-#     print(todo.created_by)
-#     return todo
-
-
 class TodoList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -101,8 +94,6 @@ class Todo(Resource):
     def put(self, id):
         args = self.reqparse.parse_args()
         args.edited = False
-        print(args.name)
-        print(args.completed)
         args.updated_at = datetime.datetime.now()
         query = models.Todo.update(**args).where(models.Todo.id == id)
         query.execute()
