@@ -3,23 +3,23 @@
 A set of APIs that serve a Angular.js Todo app.
 
 ## Resources
-URIs relative to http://0.0.0.0:8000/
+URIs relative to http://127.0.0.1:5000/ 
 
 ### Users 
 Method    | Endpoint        |Data                   | Description              | Auth Req? | Rate Limited? 
 ----------|-----------------|-----------------------|--------------------------|----------------|--------
-|GET      | users           |                       | list all users           | ✖             | ✖           
-|POST     | users           |username<br>email<br>password<br>verify_password  | create user  | ✖ |✔
-|GET      | users/id        |                        | return username          | ✖                 |✔
+|GET      | users           |                       | list all users           | wip             | wip           
+|POST     | users           |username<br>email<br>password<br>verify_password  | create user  | wip |wip
+|GET      | users/id        |                        | return username          | wip                 |wip
 
 ### Todos
 Method    | Endpoint        |Data                   | Description              | Auth Req? | Rate Limited? 
 ----------|-----------------|-----------------------|--------------------------|----------------|--------
-|GET      | api/v1/todos    |                       | return all todos         | ✖              |✖           
-|POST     | api/v1/todos    |name                   | create todo              | ✔             |✔
-|GET      | api/v1/todos/id |id                     | return todo detail       | ✖              |✖
-|PUT      | api/v1/todos/id |name<br>edited<br>completed<br>updated_at| edit todo             | ✔             |✔
-|DELETE   |api/v1/todos/id  |                       | immediately delete selected todo  | ✔           |✔
+|GET      | api/v1/todos    |                       | return all todos         | wip              |wip           
+|POST     | api/v1/todos    |name                   | create todo              | wip             |wip
+|GET      | api/v1/todos/id |id                     | return todo detail       | wip              |wip
+PUT      | api/v1/todos/id |name<br>edited<br>completed<br>updated_at| edit todo             | wip             |wip
+|DELETE   |api/v1/todos/id  |                       | immediately delete selected todo  | wip           |wip
 
 ### Model Fields
 Name   | Type        |Required? |
