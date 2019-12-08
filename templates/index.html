@@ -1,48 +1,49 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <title>Todo API with Flask</title>
-  <link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="/static/styles/main.css" type="text/css">
+    <title>Todo API with Flask</title>
+    <link href='https://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/static/styles/main.css" type="text/css">
     <link rel="shortcut icon" type="image/png" href="/static/images/favicon.png">
 </head>
-<body ng-app="todoListApp">
+<html ng-app="todoListApp">
 
-  <!-- Flash messages -->
+    <!-- Flash messages -->
 
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                <div class="notification {{category}}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="notification {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <!-- Login status messages -->
-{% if current_user.is_authenticated %}
-    Logged in as: {{ current_user }} | <a href="{{  url_for('logout') }}">Logout</a>
-    {%  else %}
-    Not logged in | <a href="{{  url_for('login') }}">Login</a>
-{% endif %}
+    {% if current_user.is_authenticated %}
+        Logged in as: {{ current_user }} | <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        Not logged in | <a href="{{ url_for('login') }}">Login</a> or
+        <a href="{{ url_for('register') }}">Create Account</a>
+    {% endif %}
 
-  <h1>My TODOs!</h1>
-  
-  <div class="list" ng-controller="mainCtrl">
-    <div class="add">
-      <a href="#" ng-click="addTodo()">
-        + Add a New Task</a>
-      </div>
-    <todo></todo>
-   </div>
+    <h1>My TODOs!</h1>
 
-  <!-- Angular assets (DONT REMOVE)-->
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-resource.min.js"></script>
+    <div class="list" ng-controller="mainCtrl">
+        <div class="add">
+            <a href="#" ng-click="addTodo()">
+                + Add a New Task</a>
+        </div>
+        <todo></todo>
+    </div>
 
-  <script src="/static/scripts/app.js"></script>
-  <script src="/static/scripts/resources/todo.js"></script>
-  <script src="/static/scripts/controllers/main.js"></script>
-  <script src="/static/scripts/controllers/todo.js"></script>
-  <script src="/static/scripts/directives/todo.js"></script>
-</body>
+    <!-- Angular assets (DONT REMOVE)-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular-resource.min.js"></script>
+
+    <script src="/static/scripts/app.js"></script>
+    <script src="/static/scripts/resources/todo.js"></script>
+    <script src="/static/scripts/controllers/main.js"></script>
+    <script src="/static/scripts/controllers/todo.js"></script>
+    <script src="/static/scripts/directives/todo.js"></script>
+    </body>
 </html>

@@ -55,6 +55,21 @@ def my_todos():
     return render_template('index.html')
 
 
+@app.route('/register', methods=('GET', 'POST'))
+def register():
+    """Define the registration view."""
+    form = forms.RegisterForm()
+    if form.validate_on_submit():
+        flash("Registration successful.", "success")
+        models.User.create_user(
+            username=form.username.data,
+            email=form.email.data,
+            password=form.password.data
+        )
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
+
+
 @app.route('/login', methods=('GET', 'POST'))
 def login():
     """Define the login view."""
