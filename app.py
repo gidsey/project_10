@@ -2,7 +2,7 @@ from flask import Flask, render_template, g, jsonify, flash, redirect, url_for
 
 from flask_login import (LoginManager, login_user, logout_user,
                          login_required, current_user)
-from argon2 import PasswordHasher
+from argon2 import PasswordHasher, exceptions
 
 import config
 import models
@@ -80,12 +80,14 @@ def login():
         except models.DoesNotExist:
             flash("Your email or password does not match.", "error")
         else:
-            if HASHER.verify(user.password, form.password.data):
+            try:
+                HASHER.verify(user.password, form.password.data)
+            except exceptions.VerifyMismatchError:
+                flash("Your email or password does not match.", "error")
+            else:
                 login_user(user)
                 flash("Login successful.", "success")
                 return redirect(url_for('my_todos'))
-            else:
-                flash("Your email or password does not match.", "error")
     return render_template('login.html', form=form)  # unsuccesful login
 
 
