@@ -4,6 +4,7 @@ from flask import Blueprint, make_response
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
 
 import models
+from auth import auth
 
 user_fields = {
     'username': fields.String,
@@ -48,6 +49,7 @@ class UserList(Resource):
         )
         super().__init__()
 
+    @auth.login_required
     def get(self):
         users = [marshal(user, user_fields) for user in models.User.select()]
         return {'users': users}
