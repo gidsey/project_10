@@ -1,7 +1,7 @@
 import json
 import datetime
 
-from flask import Blueprint, url_for, make_response, g
+from flask import Blueprint, url_for, make_response, g, flash, redirect
 
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
 
@@ -91,23 +91,35 @@ class Todo(Resource):
         return todo_or_404(id)
 
     @marshal_with(todo_fields)
+    @auth.login_required
     def put(self, id):
-        args = self.reqparse.parse_args()
-        args.edited = False
-        args.updated_at = datetime.datetime.now()
-        query = models.Todo.update(**args).where(models.Todo.id == id)
-        query.execute()
-        todo = todo_or_404(id)
-        return todo, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
-
-    def delete(self, id):
-        try:
-            todo = models.Todo.get(models.Todo.id == id)
-        except models.Todo.DoesNotExist:
-            return make_response(json.dumps({'error': "That TODO does not exist"}), 403)
+        task_owner = models.Todo.get(models.Todo.id == id).created_by
+        if g.user != task_owner:
+            abort(400, message='Only the task owner can edit this task')
         else:
-            todo.delete_instance()
-        return '', 204,
+            args = self.reqparse.parse_args()
+            args.edited = False
+            args.updated_at = datetime.datetime.now()
+            query = models.Todo.update(**args).where(models.Todo.id == id)
+            query.execute()
+            todo = todo_or_404(id)
+            return todo, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
+
+
+
+    @auth.login_required
+    def delete(self, id):
+        task_owner = models.Todo.get(models.Todo.id == id).created_by
+        if g.user != task_owner:
+            abort(400, message='Only the task owner can delete this task')
+        else:
+            try:
+                todo = models.Todo.get(models.Todo.id == id)
+            except models.Todo.DoesNotExist:
+                return make_response(json.dumps({'error': "That TODO does not exist"}), 403)
+            else:
+                todo.delete_instance()
+            return '', 204,
 
 
 todos_api = Blueprint('resources.todos', __name__)
