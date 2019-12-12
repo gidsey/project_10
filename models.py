@@ -56,7 +56,7 @@ class User(UserMixin, Model):
     def verify_password(self, password):
         return HASHER.verify(self.password, password)
 
-    def generate_auth_token(self, expires=600):
+    def generate_auth_token(self, expires=3600):
         serializer = Serializer(config.SECRET_KEY, expires_in=expires)
         return serializer.dumps({'id': self.id})
 
