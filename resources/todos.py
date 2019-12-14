@@ -1,7 +1,7 @@
 import json
 import datetime
 
-from flask import Blueprint, url_for, make_response, g, flash, redirect
+from flask import Blueprint, url_for, make_response, g
 
 from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
 

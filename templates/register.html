@@ -2,11 +2,14 @@
 {% from 'macros.html' import render_field %}
 
 {% block content %}
-<form method="POST" acton="" class="form">
-	{{ form.hidden_tag() }}
-	{% for field in form %}
-		{{ render_field(field) }}
-	{% endfor %}
-	<button type="submit" id="submit">Register</button>
-</form>
+    <h1>Register</h1>
+    <p>Or <a href="{{ url_for('login') }}">login</a> as an existing user.</p>
+    <form method="POST" acton="" class="form">
+        {{ form.hidden_tag() }}
+        {% for field in form %}
+            {{ render_field(field) }}
+        {% endfor %}
+        <button type="submit" id="submit">Register</button>
+    </form>
+    <div><a href="{{ url_for('my_todos') }}">Home</a></div>
 {% endblock %}

@@ -7,9 +7,8 @@
     <link rel="shortcut icon" type="image/png" href="/static/images/favicon.png">
 </head>
 <html ng-app="todoListApp">
-
+<div class="messages">
     <!-- Flash messages -->
-
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -24,8 +23,10 @@
     {% else %}
         Not logged in | <a href="{{ url_for('login') }}">Login</a> or
         <a href="{{ url_for('register') }}">Create Account</a>
+        <div class="alert">Note: you must be logged in to add, edit or delete tasks.<br>
+        Tasks can only be edited or deleted by their owner.</div>
     {% endif %}
-
+</div>
     <h1>My TODOs!</h1>
 
     <div class="list" ng-controller="mainCtrl">

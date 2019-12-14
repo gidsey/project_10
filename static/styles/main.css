@@ -122,3 +122,13 @@ button {
   color: #C5A14E;
   margin-bottom: 40px;
 }
+
+.messages {
+  width: 80%;
+  margin: 20px auto;
+}
+.alert {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #777B7E;
+}
