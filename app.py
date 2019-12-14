@@ -1,5 +1,8 @@
 from flask import Flask, render_template, g, jsonify, flash, redirect, url_for
 
+from flask_limiter import Limiter
+from flask_limiter.util import get_ipaddr
+
 from flask_login import (LoginManager, login_user, logout_user,
                          login_required, current_user)
 from argon2 import PasswordHasher, exceptions
@@ -26,6 +29,7 @@ login_manager.login_view = 'login'  # Name of the login view.
 HASHER = PasswordHasher()
 
 
+
 @login_manager.user_loader
 def load_user(userid):
     """Look up a user."""
@@ -48,6 +52,9 @@ def after_request(response):
     """Close the DB connection after each request."""
     g.db.close()
     return response
+
+
+limiter = Limiter(app, global_limits=["1/hour"], key_func=get_ipaddr)
 
 
 @app.route('/')
