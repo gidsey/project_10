@@ -1,6 +1,12 @@
 # Todo API with Flask
 
-A set of APIs that serve a Angular.js Todo app.
+A set of APIs that serve a Angular.js Todo app, combined with a user model for authentication.
+
+## Parameters
+
+Users must be authenticated in order to create, edit or delete tasks.
+Tasks can only be edited or deleted by their owner.
+
 
 ## Resources
 URIs relative to http://127.0.0.1:5000/ 
@@ -20,6 +26,10 @@ Method    | Endpoint        |Data                   | Description              |
 |GET      | api/v1/todos/id |id                     | return task detail       | no   |no
 |PUT      | api/v1/todos/id |name<br>edited<br>completed<br>updated_at| edit todo  | yes -task owner only |100/hour
 |DELETE   |api/v1/todos/id  |                 |delete selected task  | yes -task owner only |100/hour
+
+
+## Unit tests
+
 
 
 ## Running Locally
