@@ -14,9 +14,9 @@ URIs relative to http://127.0.0.1:5000/
 ### Users 
 Method    | Endpoint        |Data                   | Description              | Auth Req? | Rate Limited? 
 ----------|-----------------|-----------------------|--------------------------|----------------|--------
-|GET      | users           |                       | list all users           | yes             | no           
-|POST     | users           |username<br>email<br>password<br>verify_password  | create user  | no |10/day
-|GET      | users/id        |                        | return username          | yes                 |no
+|GET      | api/v1/users           |                       | list all users           | yes             | no           
+|POST     | api/v1/users           |username<br>email<br>password<br>verify_password  | create user  | no |10/day
+|GET      | api/v1/users/id        |                        | return username          | yes                 |no
 
 ### Todos
 Method    | Endpoint        |Data                   | Description              | Auth Req? | Rate Limited? 
