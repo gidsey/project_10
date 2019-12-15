@@ -29,7 +29,6 @@ login_manager.login_view = 'login'  # Name of the login view.
 HASHER = PasswordHasher()
 
 
-
 @login_manager.user_loader
 def load_user(userid):
     """Look up a user."""
@@ -54,7 +53,10 @@ def after_request(response):
     return response
 
 
-limiter = Limiter(app, global_limits=["1/hour"], key_func=get_ipaddr)
+# Rate limit the APIs
+limiter = Limiter(app, global_limits=[config.DEFAULT_RATE], key_func=get_ipaddr)
+limiter.limit(config.DEFAULT_RATE, per_method=True, methods=["post", "put", "delete"])(todos_api)
+limiter.limit("10/day", per_method=True, methods=["post"])(users_api)
 
 
 @app.route('/')

@@ -10,12 +10,18 @@ user_fields = {
     'username': fields.String,
 }
 
+user_detail_fields = {
+    'username': fields.String,
+    'email': fields.String,
+}
+
 
 def user_or_404(user_id):
+    """Return user from DB by ID, or error message if task does not exist."""
     try:
         user = models.User.get(models.User.id == user_id)
     except models.User.DoesNotExist:
-        abort(404, message='User withh ID {} does not exist'.format(user_id))
+        abort(404, message='User with ID {} does not exist'.format(user_id))
     else:
         return user
 
@@ -51,10 +57,12 @@ class UserList(Resource):
 
     @auth.login_required
     def get(self):
+        """Return a list of registered users."""
         users = [marshal(user, user_fields) for user in models.User.select()]
         return {'users': users}
 
     def post(self):
+        """Add a new user."""
         args = self.reqparse.parse_args()
         if args.get('password') == args.get('verify_password'):
             user = models.User.create_user(**args)
@@ -66,8 +74,10 @@ class User(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
-    @marshal_with(user_fields)
+    @marshal_with(user_detail_fields)
+    @auth.login_required
     def get(self, id):
+        """Return the username and email for the selected userID"""
         return user_or_404(id)
 
 

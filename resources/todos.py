@@ -21,6 +21,7 @@ todo_fields = {
 
 
 def todo_or_404(todo_id):
+    """Return task from DB by ID, or error message if task does not exist."""
     try:
         todo = models.Todo.get(models.Todo.id == todo_id)
     except models.Todo.DoesNotExist:
@@ -41,12 +42,14 @@ class TodoList(Resource):
         super().__init__()
 
     def get(self):
+        """Return a list of tasks."""
         todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
         return todos
 
     @marshal_with(todo_fields)
     @auth.login_required
     def post(self):
+        """Post a new task and assign it to the current user"""
         args = self.reqparse.parse_args()
         todo = models.Todo.create(
             created_by=g.user,
@@ -88,11 +91,16 @@ class Todo(Resource):
 
     @marshal_with(todo_fields)
     def get(self, id):
+        """Return details of a single task."""
         return todo_or_404(id)
 
     @marshal_with(todo_fields)
     @auth.login_required
     def put(self, id):
+        """
+        Allow task owners to edit existing tasks.
+        Prevent other users from editing tasks that do not belong to them.
+        """
         task_owner = models.Todo.get(models.Todo.id == id).created_by
         if g.user != task_owner:
             abort(400, message='Only the task owner can edit this task')
