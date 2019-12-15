@@ -4,7 +4,6 @@ import unittest
 from app import app
 from models import User, Todo
 
-
 MODELS = [User, Todo]
 # use an in-memory SQLite for tests.
 test_db = SqliteDatabase(':memory:')
@@ -15,7 +14,15 @@ class TodoTestCase(unittest.TestCase):
         self.app = app
         self.app.testing = True
         self.client = app.test_client()
-        self.data = {"name": "Walk the dog in the park"}
+        self.user = {
+                "username": 'user_1',
+                "email": 'user_1@example.com',
+                "password": 'password',
+                "verify_password": 'password'
+        }
+        self.data = {
+            "name": "Walk the dog in the park"
+        }
         self.new_data = {
             "name": "Feed the cat",
             "edited": True,
@@ -33,6 +40,13 @@ class TodoTestCase(unittest.TestCase):
         test_db.close()
 
     def test_todo_api(self):
+        # CREATE USER
+        resp = self.client.post(
+            path='/api/v1/users',
+            data=json.dumps(self.user),
+            content_type='application/json')
+        self.assertEqual(resp.status_code, 201)
+
         #  POST
         resp = self.client.post(
             path='/api/v1/todos',
