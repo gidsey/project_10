@@ -2,10 +2,10 @@ from peewee import SqliteDatabase
 import json
 import unittest
 from app import app
-import models
+from models import User, Todo
 
 
-MODELS = [models.Todo]
+MODELS = [User, Todo]
 # use an in-memory SQLite for tests.
 test_db = SqliteDatabase(':memory:')
 
@@ -16,7 +16,7 @@ class TodoTestCase(unittest.TestCase):
         self.app.testing = True
         self.client = app.test_client()
         self.data = {"name": "Walk the dog in the park"}
-        self.newdata = {
+        self.new_data = {
             "name": "Feed the cat",
             "edited": True,
             "completed": False,
@@ -39,7 +39,7 @@ class TodoTestCase(unittest.TestCase):
             data=json.dumps(self.data),
             content_type='application/json')
         self.assertEqual(resp.status_code, 201)
-        todo = models.Todo.get(name='Walk the dog in the park')
+        todo = Todo.get(name='Walk the dog in the park')
 
         #  GET ALL
         resp = self.client.get(
@@ -64,7 +64,7 @@ class TodoTestCase(unittest.TestCase):
         #  EDIT TASK
         resp = self.client.put(
             path='/api/v1/todos/{}'.format(todo.id),
-            data=json.dumps(self.newdata),
+            data=json.dumps(self.new_data),
             content_type='application/json')
         self.assertEqual(resp.status_code, 200)
         self.assertIn(b'Feed the cat', resp.data)

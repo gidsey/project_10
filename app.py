@@ -1,10 +1,9 @@
 from flask import Flask, render_template, g, jsonify, flash, redirect, url_for
 
 from flask_limiter import Limiter
-from flask_limiter.util import get_ipaddr
+from flask_limiter.util import get_remote_address
 
-from flask_login import (LoginManager, login_user, logout_user,
-                         login_required, current_user)
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from argon2 import PasswordHasher, exceptions
 
 import config
@@ -18,15 +17,12 @@ from resources.todos import todos_api
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
-app.register_blueprint(users_api, url_prefix='/api/v1')
-app.register_blueprint(todos_api, url_prefix='/api/v1')
+HASHER = PasswordHasher()
 
 # Set up the login manager for the app
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'  # Name of the login view.
-
-HASHER = PasswordHasher()
 
 
 @login_manager.user_loader
@@ -54,9 +50,14 @@ def after_request(response):
 
 
 # Rate limit the APIs
-limiter = Limiter(app, global_limits=[config.DEFAULT_RATE], key_func=get_ipaddr)
+limiter = Limiter(key_func=get_remote_address)
+limiter.init_app(app)
 limiter.limit(config.DEFAULT_RATE, per_method=True, methods=["post", "put", "delete"])(todos_api)
 limiter.limit("10/day", per_method=True, methods=["post"])(users_api)
+
+# Register the blueprints
+app.register_blueprint(users_api, url_prefix='/api/v1')
+app.register_blueprint(todos_api, url_prefix='/api/v1')
 
 
 @app.route('/')

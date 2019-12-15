@@ -1,5 +1,7 @@
 import json
 import datetime
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from flask import Blueprint, url_for, make_response, g
 
@@ -8,6 +10,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with
 from auth import auth
 
 import models
+
 
 todo_fields = {
     'id': fields.Integer,
@@ -112,7 +115,6 @@ class Todo(Resource):
             query.execute()
             todo = todo_or_404(id)
             return todo, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
-
 
 
     @auth.login_required
