@@ -19,17 +19,8 @@ Method    | Endpoint        |Data                   | Description              |
 |POST     | api/v1/todos    |name                   | create task         | yes             |100/hour
 |GET      | api/v1/todos/id |id                     | return task detail       | no   |no
 |PUT      | api/v1/todos/id |name<br>edited<br>completed<br>updated_at| edit todo  | yes -task owner only |100/hour
-|DELETE   |api/v1/todos/id  |              §   | immediately delete selected todo  | yes -task owner only |100/hour
+|DELETE   |api/v1/todos/id  |                 |delete selected task  | yes -task owner only |100/hour
 
-### Model Fields
-Name   | Type        |Required? |
-----------|-----------------|---|
-|id|Primary Key|required (auto-set)|
-|name|Text|required|
-|edited|Boolean|not required|
-|completed|Boolean|not required|
-|created_at|Datetime|required (auto-set)|
-|updated_at|Datetime|not required (auto-set)|
 
 ## Running Locally
 
