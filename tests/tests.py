@@ -1,8 +1,8 @@
-from peewee import SqliteDatabase
+from peewee import *
 import json
 import unittest
 from app import app
-from models import User, Todo
+from models import Todo, User
 
 MODELS = [User, Todo]
 # use an in-memory SQLite for tests.
@@ -10,6 +10,16 @@ test_db = SqliteDatabase(':memory:')
 
 
 class TodoTestCase(unittest.TestCase):
+    @staticmethod
+    def create_users(count=2):
+        for i in range(count):
+            User.create_user(
+                username='user_{}'.format(i),
+                email='test_{}@example.com'.format(i),
+                password='password',
+                verify_password='password'
+            )
+
     def setUp(self):
         self.app = app
         self.app.testing = True
@@ -39,59 +49,70 @@ class TodoTestCase(unittest.TestCase):
         test_db.drop_tables(MODELS)
         test_db.close()
 
-    def test_todo_api(self):
-        # CREATE USER
-        resp = self.client.post(
-            path='/api/v1/users',
-            data=json.dumps(self.user),
-            content_type='application/json')
-        self.assertEqual(resp.status_code, 201)
+    def test_create_user(self):
+        with test_db(User,):
+            self.create_users()
+            self.assertEqual(User.select().count(), 2)
+            self.assertNotEqual(
+                User.select().get().password,
+                'password'
+            )
 
-        #  POST
-        resp = self.client.post(
-            path='/api/v1/todos',
-            data=json.dumps(self.data),
-            content_type='application/json')
-        self.assertEqual(resp.status_code, 201)
-        todo = Todo.get(name='Walk the dog in the park')
 
-        #  GET ALL
-        resp = self.client.get(
-            path='/api/v1/todos',
-            content_type='application/json')
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(b'Walk the dog in the park', resp.data)
-
-        #  GET SINGLE
-        resp = self.client.get(
-            path='/api/v1/todos/{}'.format(todo.id),
-            content_type='application/json')
-        self.assertEqual(resp.status_code, 200)
-
-        #  GET SINGLE (404)
-        resp = self.client.get(
-            path='/api/v1/todos/{}'.format(79489),
-            content_type='application/json')
-        self.assertEqual(resp.status_code, 404)
-        self.assertIn(b'Todo 79489 does not exist', resp.data)
-
-        #  EDIT TASK
-        resp = self.client.put(
-            path='/api/v1/todos/{}'.format(todo.id),
-            data=json.dumps(self.new_data),
-            content_type='application/json')
-        self.assertEqual(resp.status_code, 200)
-        self.assertIn(b'Feed the cat', resp.data)
-
-        #  DELETE TASK
-        resp = self.client.delete(
-            path='/api/v1/todos/{}'.format(todo.id))
-        self.assertEqual(resp.status_code, 204)
-
-        #  DELETE TASK (403)
-        resp = self.client.delete(
-            path='/api/v1/todos/{}'.format(79489))
-        self.assertEqual(resp.status_code, 403)
+    #
+    # def test_todo_api(self):
+    #     # CREATE USER
+    #     resp = self.client.post(
+    #         path='/api/v1/users',
+    #         data=json.dumps(self.user),
+    #         content_type='application/json')
+    #     self.assertEqual(resp.status_code, 201)
+    #
+    #     #  POST
+    #     resp = self.client.post(
+    #         path='/api/v1/todos',
+    #         data=json.dumps(self.data),
+    #         content_type='application/json')
+    #     self.assertEqual(resp.status_code, 201)
+    #     todo = Todo.get(name='Walk the dog in the park')
+    #
+    #     #  GET ALL
+    #     resp = self.client.get(
+    #         path='/api/v1/todos',
+    #         content_type='application/json')
+    #     self.assertEqual(resp.status_code, 200)
+    #     self.assertIn(b'Walk the dog in the park', resp.data)
+    #
+    #     #  GET SINGLE
+    #     resp = self.client.get(
+    #         path='/api/v1/todos/{}'.format(todo.id),
+    #         content_type='application/json')
+    #     self.assertEqual(resp.status_code, 200)
+    #
+    #     #  GET SINGLE (404)
+    #     resp = self.client.get(
+    #         path='/api/v1/todos/{}'.format(79489),
+    #         content_type='application/json')
+    #     self.assertEqual(resp.status_code, 404)
+    #     self.assertIn(b'Todo 79489 does not exist', resp.data)
+    #
+    #     #  EDIT TASK
+    #     resp = self.client.put(
+    #         path='/api/v1/todos/{}'.format(todo.id),
+    #         data=json.dumps(self.new_data),
+    #         content_type='application/json')
+    #     self.assertEqual(resp.status_code, 200)
+    #     self.assertIn(b'Feed the cat', resp.data)
+    #
+    #     #  DELETE TASK
+    #     resp = self.client.delete(
+    #         path='/api/v1/todos/{}'.format(todo.id))
+    #     self.assertEqual(resp.status_code, 204)
+    #
+    #     #  DELETE TASK (403)
+    #     resp = self.client.delete(
+    #         path='/api/v1/todos/{}'.format(79489))
+    #     self.assertEqual(resp.status_code, 403)
 
 
 if __name__ == '__main__':
