@@ -1,9 +1,11 @@
 from peewee import *
 import json
 import unittest
-from app import app
+
 from models import Todo, User
 from flask import g
+
+from app import app
 
 MODELS = [User, Todo]
 
@@ -75,20 +77,25 @@ class TodoTestCase(unittest.TestCase):
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-        self.user = User.get(username='user_1')
-        self.token = self.user.generate_auth_token()
+        # self.user = User.get(username='user_1')
+
 
         #  POST
-
-        response = self.client.post(
-            path='/api/v1/todos',
-            data=json.dumps(self.data),
-            headers={
-                'Content-Type': 'application/json',
-                'Authorization': self.token
-            })
-        self.assertEqual(response.status_code, 201)
-        todo = Todo.get(name='Walk the dog in the park')
+        with app.app_context():
+            self.user = User.get(username='user_1')
+            # self.token = self.user.generate_auth_token()
+            g.user = self.user
+            token = self.user.generate_auth_token()
+            print('g.user={}'.format(g.user))
+            response = self.client.post(
+                path='/api/v1/todos',
+                data=json.dumps(self.data),
+                headers={
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                })
+            self.assertEqual(response.status_code, 201)
+            todo = Todo.get(name='Walk the dog in the park')
 
         # #  GET ALL
         # response = self.client.get(

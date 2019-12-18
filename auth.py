@@ -27,8 +27,8 @@ def verify_password(email_or_username, password):
 
 @token_auth.verify_token
 def verify_token(token):
-    # if token == '':
-    #     token = g.user.generate_auth_token()
+    if token == '':
+        token = g.user.generate_auth_token()
     user = models.User.verify_auth_token(token)
     if user is not None:
         g.user = user
