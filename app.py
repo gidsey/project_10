@@ -98,7 +98,7 @@ def login():
                 login_user(user)
                 flash("Login successful.", "success")
                 return redirect(url_for('my_todos'))
-    return render_template('login.html', form=form)  # unsuccesful login
+    return render_template('login.html', form=form)  # unsuccessful login
 
 
 @app.route('/logout')

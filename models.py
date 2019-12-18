@@ -9,6 +9,8 @@ from peewee import *
 import config
 
 db = SqliteDatabase('todo.sqlite')
+
+
 HASHER = PasswordHasher()
 
 

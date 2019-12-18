@@ -11,19 +11,19 @@ from app import app
 
 MODELS = (User, Todo,)
 
-test_db = SqliteDatabase(':memory:')
+db = SqliteDatabase(':memory:')
 
 
 # Bind the given models to the db for the duration of wrapped block.
 def use_test_database(fn):
     @wraps(fn)
     def inner(self):
-        with test_db.bind_ctx(MODELS):
-            test_db.create_tables(MODELS)
+        with db.bind_ctx(MODELS):
+            db.create_tables(MODELS)
             try:
                 fn(self)
             finally:
-                test_db.drop_tables(MODELS)
+                db.drop_tables(MODELS)
 
     return inner
 
@@ -32,7 +32,10 @@ def use_test_database(fn):
 class TestResources(TestCase):
 
     def setUp(self):
-        self.app = app.test_client()
+        self.app = app
+        app.config['TESTING'] = True
+        self.client = app.test_client()
+
 
         self.data = {
             "name": "Walk the dog in the park"
