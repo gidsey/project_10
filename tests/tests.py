@@ -9,7 +9,7 @@ from app import app
 
 MODELS = [User, Todo]
 
-db = SqliteDatabase('todo.sqlite')
+db = SqliteDatabase('test.sqlite')
 
 
 class TodoTestCase(unittest.TestCase):
@@ -27,7 +27,7 @@ class TodoTestCase(unittest.TestCase):
         self.app = app
         self.app.testing = True
         self.client = app.test_client()
-        self.user = {
+        self.user_data = {
                 "username": 'user_1',
                 "email": 'user_1@example.com',
                 "password": 'password',
@@ -53,62 +53,67 @@ class TodoTestCase(unittest.TestCase):
         db.connect()
         db.create_tables(MODELS)
 
+        self.test_user = User.create_user(
+            username='tester',
+            email='tester@test.com',
+            password='password'
+        )
+
+        self.token = self.test_user.generate_auth_token()
+
+        print(self.test_user)
+        print(self.token)
+
     def tearDown(self):
         pass
         db.drop_tables(MODELS)
         db.close()
 
 
-
-
     def test_todo_api(self):
-        # CREATE USER
+        # CREATE USER VIA API
         response = self.client.post(
             path='/api/v1/users',
-            data=json.dumps(self.user),
+            data=json.dumps(self.user_data),
             content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
-
-        # LOGIN USER
+        # LOGIN USER VIA API
         response = self.client.post(
             path='/login',
             data=json.dumps(self.user_creds),
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-        # self.user = User.get(username='user_1')
+        # POST TASK VIA API
+        token = "token " + self.token.decode('ascii')
+        response = self.client.post(
+            path='/api/v1/todos',
+            data=json.dumps(self.data),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 201)
+        todo = Todo.get(name='Walk the dog in the park')
 
+        #  GET ALL TASK VIA API
+        response = self.client.get(
+            path='/api/v1/todos',
+            headers={
+                'Content-Type': 'application/json',
+            })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Walk the dog in the park', response.data)
 
-        #  POST
-        with app.app_context():
-            self.user = User.get(username='user_1')
-            # self.token = self.user.generate_auth_token()
-            g.user = self.user
-            token = self.user.generate_auth_token()
-            print('g.user={}'.format(g.user))
-            response = self.client.post(
-                path='/api/v1/todos',
-                data=json.dumps(self.data),
-                headers={
-                    'Content-Type': 'application/json',
-                    'Authorization': token
-                })
-            self.assertEqual(response.status_code, 201)
-            todo = Todo.get(name='Walk the dog in the park')
-
-        # #  GET ALL
-        # response = self.client.get(
-        #     path='/api/v1/todos',
-        #     content_type='application/json')
-        # self.assertEqual(response.status_code, 200)
-        # self.assertIn(b'Walk the dog in the park', response.data)
-        #
-        # #  GET SINGLE
-        # response = self.client.get(
-        #     path='/api/v1/todos/{}'.format(todo.id),
-        #     content_type='application/json')
-        # self.assertEqual(response.status_code, 200)
+        # #  GET SINGLE TASK VIA API
+        response = self.client.get(
+            path='/api/v1/todos/{}'.format(todo.id),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 200)
         #
         # #  GET SINGLE (404)
         # response = self.client.get(
