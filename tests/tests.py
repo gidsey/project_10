@@ -12,31 +12,20 @@ db = SqliteDatabase('todo.sqlite')
 
 
 class TodoTestCase(unittest.TestCase):
-    @staticmethod
-    def create_users(count=2):
-        for i in range(count):
-            User.create_user(
-                username='user_{}'.format(i),
-                email='test_{}@example.com'.format(i),
-                password='password',
-                verify_password='password'
-            )
-
     def setUp(self):
         self.app = app
         self.app.testing = True
         self.client = app.test_client()
         self.user_data = {
-                "username": 'user_1',
-                "email": 'user_1@example.com',
-                "password": 'password',
-                "verify_password": 'password'
+            "username": 'user_1',
+            "email": 'user_1@example.com',
+            "password": 'password',
+            "verify_password": 'password'
         }
         self.user_creds = {
             "username": 'user_1',
             "email": 'user_1@example.com',
         }
-
         self.data = {
             "name": "Walk the dog in the park"
         }
@@ -52,12 +41,15 @@ class TodoTestCase(unittest.TestCase):
         db.connect()
         db.create_tables(MODELS)
 
-        self.test_user = User.create_user(
+        self.test_user_1 = User.create_user(
             username='tester',
             email='tester@test.com',
             password='password'
         )
-        self.token = self.test_user.generate_auth_token()
+        self.token = self.test_user_1.generate_auth_token()
+
+    def format_token(self):
+        return "token " + self.token.decode('ascii')
 
     def tearDown(self):
         pass
@@ -65,22 +57,22 @@ class TodoTestCase(unittest.TestCase):
         db.close()
 
     def test_todo_api(self):
-        # CREATE USER VIA API
+        # create user via api
         response = self.client.post(
             path='/api/v1/users',
             data=json.dumps(self.user_data),
             content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
-        # LOGIN USER VIA API
+        # login user via api
+        token = self.format_token()
         response = self.client.post(
             path='/login',
             data=json.dumps(self.user_creds),
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-        # POST TASK VIA API
-        token = "token " + self.token.decode('ascii')
+        # post task via api
         response = self.client.post(
             path='/api/v1/todos',
             data=json.dumps(self.data),
@@ -92,7 +84,7 @@ class TodoTestCase(unittest.TestCase):
         todo = Todo.get(name='Walk the dog in the park')
         print(todo)
 
-        #  GET ALL TASK VIA API
+        #  get all tasks via api
         response = self.client.get(
             path='/api/v1/todos',
             headers={
@@ -101,7 +93,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Walk the dog in the park', response.data)
 
-        # #  GET SINGLE TASK VIA API
+        #  get single task via api
         response = self.client.get(
             path='/api/v1/todos/{}'.format(todo.id),
             headers={
@@ -110,7 +102,7 @@ class TodoTestCase(unittest.TestCase):
             })
         self.assertEqual(response.status_code, 200)
 
-        #  GET SINGLE (404) VIA API
+        #  get single (404) via api
         response = self.client.get(
             path='/api/v1/todos/{}'.format(79489),
             headers={
@@ -120,7 +112,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIn(b'Todo 79489 does not exist', response.data)
 
-        #  EDIT TASK VIA API
+        #  edit task via api
         response = self.client.put(
             path='/api/v1/todos/{}'.format(todo.id),
             data=json.dumps(self.new_data),
@@ -131,7 +123,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Feed the cat', response.data)
 
-        #  DELETE TASK VIA API
+        #  delete task via api
         response = self.client.delete(
             path='/api/v1/todos/{}'.format(todo.id),
             headers={
@@ -140,7 +132,7 @@ class TodoTestCase(unittest.TestCase):
             })
         self.assertEqual(response.status_code, 204)
 
-        # DELETE TASK (403) VIA API
+        # delete nonexistent task (403) via api
         response = self.client.delete(
             path='/api/v1/todos/{}'.format(79489),
             headers={
@@ -148,6 +140,14 @@ class TodoTestCase(unittest.TestCase):
                 'Authorization': token
             })
         self.assertEqual(response.status_code, 403)
+
+    def test_post_api(self):
+        # create user via api
+        response = self.client.post(
+            path='/api/v1/users',
+            data=json.dumps(self.user_data),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 201)
 
 
 if __name__ == '__main__':
