@@ -56,7 +56,7 @@ class TodoTestCase(unittest.TestCase):
         db.drop_tables(MODELS)
         db.close()
 
-    def test_todo_api(self):
+    def test_create_user(self):
         # create user via api
         response = self.client.post(
             path='/api/v1/users',
@@ -64,15 +64,17 @@ class TodoTestCase(unittest.TestCase):
             content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
+    def test_login_user(self):
         # login user via api
-        token = self.format_token()
         response = self.client.post(
             path='/login',
             data=json.dumps(self.user_creds),
             content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
+    def test_todo_resources(self):
         # post task via api
+        token = self.format_token()
         response = self.client.post(
             path='/api/v1/todos',
             data=json.dumps(self.data),
@@ -81,10 +83,9 @@ class TodoTestCase(unittest.TestCase):
                 'Authorization': token
             })
         self.assertEqual(response.status_code, 201)
-        todo = Todo.get(name='Walk the dog in the park')
-        print(todo)
 
         #  get all tasks via api
+        todo = Todo.get(name='Walk the dog in the park')
         response = self.client.get(
             path='/api/v1/todos',
             headers={
