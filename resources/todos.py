@@ -114,19 +114,17 @@ class Todo(Resource):
             todo = todo_or_404(id)
             return todo, 200, {'location': url_for('resources.todos.todo', id=todo.id)}
 
-
     @auth.login_required
     def delete(self, id):
-        task_owner = models.Todo.get(models.Todo.id == id).created_by
+        try:
+            task_owner = models.Todo.get(models.Todo.id == id).created_by
+        except models.Todo.DoesNotExist:
+            return make_response(json.dumps({'error': "That TODO does not exist"}), 403)
         if g.user != task_owner:
             abort(400, message='Only the task owner can delete this task')
         else:
-            try:
-                todo = models.Todo.get(models.Todo.id == id)
-            except models.Todo.DoesNotExist:
-                return make_response(json.dumps({'error': "That TODO does not exist"}), 403)
-            else:
-                todo.delete_instance()
+            todo = models.Todo.get(models.Todo.id == id)
+            todo.delete_instance()
             return '', 204,
 
 

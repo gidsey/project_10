@@ -90,6 +90,7 @@ class TodoTestCase(unittest.TestCase):
             })
         self.assertEqual(response.status_code, 201)
         todo = Todo.get(name='Walk the dog in the park')
+        print(todo)
 
         #  GET ALL TASK VIA API
         response = self.client.get(
@@ -109,7 +110,7 @@ class TodoTestCase(unittest.TestCase):
             })
         self.assertEqual(response.status_code, 200)
 
-        #  GET SINGLE (404)
+        #  GET SINGLE (404) VIA API
         response = self.client.get(
             path='/api/v1/todos/{}'.format(79489),
             headers={
@@ -119,7 +120,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIn(b'Todo 79489 does not exist', response.data)
 
-        #  EDIT TASK
+        #  EDIT TASK VIA API
         response = self.client.put(
             path='/api/v1/todos/{}'.format(todo.id),
             data=json.dumps(self.new_data),
@@ -130,7 +131,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Feed the cat', response.data)
 
-        #  DELETE TASK
+        #  DELETE TASK VIA API
         response = self.client.delete(
             path='/api/v1/todos/{}'.format(todo.id),
             headers={
@@ -139,7 +140,7 @@ class TodoTestCase(unittest.TestCase):
             })
         self.assertEqual(response.status_code, 204)
 
-        #  DELETE TASK (403)
+        # DELETE TASK (403) VIA API
         response = self.client.delete(
             path='/api/v1/todos/{}'.format(79489),
             headers={
