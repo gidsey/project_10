@@ -3,13 +3,12 @@ import json
 import unittest
 
 from models import Todo, User
-from flask import g
 
 from app import app
 
 MODELS = [User, Todo]
 
-db = SqliteDatabase('test.sqlite')
+db = SqliteDatabase('todo.sqlite')
 
 
 class TodoTestCase(unittest.TestCase):
@@ -58,17 +57,12 @@ class TodoTestCase(unittest.TestCase):
             email='tester@test.com',
             password='password'
         )
-
         self.token = self.test_user.generate_auth_token()
-
-        print(self.test_user)
-        print(self.token)
 
     def tearDown(self):
         pass
         db.drop_tables(MODELS)
         db.close()
-
 
     def test_todo_api(self):
         # CREATE USER VIA API
@@ -114,31 +108,45 @@ class TodoTestCase(unittest.TestCase):
                 'Authorization': token
             })
         self.assertEqual(response.status_code, 200)
-        #
-        # #  GET SINGLE (404)
-        # response = self.client.get(
-        #     path='/api/v1/todos/{}'.format(79489),
-        #     content_type='application/json')
-        # self.assertEqual(response.status_code, 404)
-        # self.assertIn(b'Todo 79489 does not exist', response.data)
-        #
-        # #  EDIT TASK
-        # response = self.client.put(
-        #     path='/api/v1/todos/{}'.format(todo.id),
-        #     data=json.dumps(self.new_data),
-        #     content_type='application/json')
-        # self.assertEqual(response.status_code, 200)
-        # self.assertIn(b'Feed the cat', response.data)
-        #
-        # #  DELETE TASK
-        # response = self.client.delete(
-        #     path='/api/v1/todos/{}'.format(todo.id))
-        # self.assertEqual(response.status_code, 204)
-        #
-        # #  DELETE TASK (403)
-        # response = self.client.delete(
-        #     path='/api/v1/todos/{}'.format(79489))
-        # self.assertEqual(response.status_code, 403)
+
+        #  GET SINGLE (404)
+        response = self.client.get(
+            path='/api/v1/todos/{}'.format(79489),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 404)
+        self.assertIn(b'Todo 79489 does not exist', response.data)
+
+        #  EDIT TASK
+        response = self.client.put(
+            path='/api/v1/todos/{}'.format(todo.id),
+            data=json.dumps(self.new_data),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Feed the cat', response.data)
+
+        #  DELETE TASK
+        response = self.client.delete(
+            path='/api/v1/todos/{}'.format(todo.id),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 204)
+
+        #  DELETE TASK (403)
+        response = self.client.delete(
+            path='/api/v1/todos/{}'.format(79489),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 403)
 
 
 if __name__ == '__main__':
