@@ -13,6 +13,7 @@ db = SqliteDatabase('todo.sqlite')
 
 class TodoTestCase(unittest.TestCase):
     def setUp(self):
+        """Set up the unit tests."""
         self.app = app
         self.app.testing = True
         self.client = app.test_client()
@@ -21,10 +22,6 @@ class TodoTestCase(unittest.TestCase):
             "email": 'user_1@example.com',
             "password": 'password',
             "verify_password": 'password'
-        }
-        self.user_creds = {
-            "username": 'user_1',
-            "email": 'user_1@example.com',
         }
         self.data = {
             "name": "Walk the dog in the park"
@@ -42,17 +39,23 @@ class TodoTestCase(unittest.TestCase):
         db.create_tables(MODELS)
 
         self.test_user_1 = User.create_user(
-            username='tester',
-            email='tester@test.com',
+            username='tester_1',
+            email='tester_1@test.com',
             password='password'
         )
-        self.token = self.test_user_1.generate_auth_token()
 
-    def format_token(self):
+        self.test_user_2 = User.create_user(
+            username='tester_2',
+            email='tester_2@test.com',
+            password='password'
+        )
+
+    def format_token(self, user):
+        """Return the user token in a header-friendly format."""
+        self.token = user.generate_auth_token()
         return "token " + self.token.decode('ascii')
 
     def tearDown(self):
-        pass
         db.drop_tables(MODELS)
         db.close()
 
@@ -63,18 +66,11 @@ class TodoTestCase(unittest.TestCase):
             data=json.dumps(self.user_data),
             content_type='application/json')
         self.assertEqual(response.status_code, 201)
-
-    def test_login_user(self):
-        # login user via api
-        response = self.client.post(
-            path='/login',
-            data=json.dumps(self.user_creds),
-            content_type='application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'username": "user_1', response.data)
 
     def test_todo_resources(self):
         # post task via api
-        token = self.format_token()
+        token = self.format_token(self.test_user_1)
         response = self.client.post(
             path='/api/v1/todos',
             data=json.dumps(self.data),
@@ -104,6 +100,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         #  get single (404) via api
+        token = self.format_token(self.test_user_1)
         response = self.client.get(
             path='/api/v1/todos/{}'.format(79489),
             headers={
@@ -113,7 +110,20 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertIn(b'Todo 79489 does not exist', response.data)
 
+        #  edit task not owned by current user via api
+        token = self.format_token(self.test_user_2)
+        response = self.client.put(
+            path='/api/v1/todos/{}'.format(todo.id),
+            data=json.dumps(self.new_data),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Only the task owner can edit this task', response.data)
+
         #  edit task via api
+        token = self.format_token(self.test_user_1)
         response = self.client.put(
             path='/api/v1/todos/{}'.format(todo.id),
             data=json.dumps(self.new_data),
@@ -124,7 +134,19 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Feed the cat', response.data)
 
+        #  delete task not owned by current user via api
+        token = self.format_token(self.test_user_2)
+        response = self.client.delete(
+            path='/api/v1/todos/{}'.format(todo.id),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': token
+            })
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b'Only the task owner can delete this task', response.data)
+
         #  delete task via api
+        token = self.format_token(self.test_user_1)
         response = self.client.delete(
             path='/api/v1/todos/{}'.format(todo.id),
             headers={
@@ -134,6 +156,7 @@ class TodoTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 204)
 
         # delete nonexistent task (403) via api
+        token = self.format_token(self.test_user_1)
         response = self.client.delete(
             path='/api/v1/todos/{}'.format(79489),
             headers={
@@ -141,14 +164,6 @@ class TodoTestCase(unittest.TestCase):
                 'Authorization': token
             })
         self.assertEqual(response.status_code, 403)
-
-    def test_post_api(self):
-        # create user via api
-        response = self.client.post(
-            path='/api/v1/users',
-            data=json.dumps(self.user_data),
-            content_type='application/json')
-        self.assertEqual(response.status_code, 201)
 
 
 if __name__ == '__main__':
