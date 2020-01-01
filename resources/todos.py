@@ -3,7 +3,7 @@ import datetime
 
 from flask import Blueprint, url_for, make_response, g
 
-from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort
+from flask_restful import Resource, Api, reqparse, fields, marshal, marshal_with, abort, inputs
 
 from auth import auth
 
@@ -73,14 +73,14 @@ class Todo(Resource):
             required=True,
             help='No edit state provided',
             location=['form', 'json'],
-            type=bool
+            type=inputs.boolean
         )
         self.reqparse.add_argument(
             'completed',
             required=True,
             help='No completed state provided',
             location=['form', 'json'],
-            type=bool
+            type=inputs.boolean
         )
         self.reqparse.add_argument(
             'updated_at',

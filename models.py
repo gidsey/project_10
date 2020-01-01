@@ -10,11 +10,11 @@ import config
 
 db = SqliteDatabase('todo.sqlite')
 
-
 HASHER = PasswordHasher()
 
 
 class User(UserMixin, Model):
+    """Define the User model."""
     username = CharField(unique=True)
     email = CharField(unique=True)
     password = CharField()
