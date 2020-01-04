@@ -27,7 +27,11 @@
         Tasks can only be edited or deleted by their owner.</div>
     {% endif %}
 </div>
+ {% if current_user.is_authenticated %}
     <h1>My TODOs!</h1>
+     {%  else %}
+     <h1>All TODOs!</h1>
+    {% endif %}
 
     <div class="list" ng-controller="mainCtrl">
         <div class="add">
