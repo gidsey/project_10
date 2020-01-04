@@ -43,9 +43,18 @@ class TodoList(Resource):
         super().__init__()
 
     def get(self):
-        """Return a list of tasks."""
-        todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
-        return todos
+        """
+        Return a list of tasks.
+        Show all task to anonymous users.
+        Show only users own tasks to logged-in users
+        """
+        if g.user.is_anonymous:
+            todos = [marshal(todo, todo_fields) for todo in models.Todo.select()]
+            return todos
+        else:
+            todos = [marshal(todo, todo_fields) for todo in models.Todo.select()
+                     .where(models.Todo.created_by == g.user.id)]
+            return todos
 
     @marshal_with(todo_fields)
     @auth.login_required
@@ -116,6 +125,10 @@ class Todo(Resource):
 
     @auth.login_required
     def delete(self, id):
+        """
+        Allow task owners to delete existing tasks.
+        Prevent other users from deleting tasks that do not belong to them.
+        """
         try:
             task_owner = models.Todo.get(models.Todo.id == id).created_by
         except models.Todo.DoesNotExist:
